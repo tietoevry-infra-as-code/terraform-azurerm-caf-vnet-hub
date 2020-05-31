@@ -51,10 +51,6 @@ module "vnet" {
   vnet_address_space    = ["10.1.0.0/16"]
   private_dns_zone_name = "publiccloud.tieto.com"
 
-  # Service Principal to create Peering role access
-  # unique object ID of the service principal(s) is reuqired.
-  service_principals = ["f08b9125-0f36-4a07-b118-32b9cf993d0d"]
-
   # (Required) To enable Azure Monitoring and flow logs
   # Possible values range between 30 and 730
   log_analytics_workspace_sku          = "PerGB2018"

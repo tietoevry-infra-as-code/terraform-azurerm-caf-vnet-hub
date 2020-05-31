@@ -19,7 +19,6 @@ module "vnet" {
   vnet_address_space    = ["10.1.0.0/16"]
   private_dns_zone_name = "publiccloud.tieto.com"
 
-
   # (Required) To enable Azure Monitoring and flow logs
   # Possible values range between 30 and 730
   log_analytics_workspace_sku          = "PerGB2018"
