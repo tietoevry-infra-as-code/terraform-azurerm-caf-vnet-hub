@@ -30,7 +30,7 @@ These types of resources are supported:
 ## Module Usage
 
 ```
-module "vnet" {
+module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # By default, this module will create a resource group, proivde the name here 
@@ -154,7 +154,7 @@ Service Endpoints allows connecting certain platform services into virtual netwo
 This module supports enabling the service endpoint of your choosing under the virtual network and with the specified subnet. The list of Service endpoints to associate with the subnet values include: `Microsoft.AzureActiveDirectory`, `Microsoft.AzureCosmosDB`, `Microsoft.ContainerRegistry`, `Microsoft.EventHub`, `Microsoft.KeyVault`, `Microsoft.ServiceBus`, `Microsoft.Sql`, `Microsoft.Storage` and `Microsoft.Web`.
 
 ```
-module "vnet" {
+module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # .... omitted
@@ -181,7 +181,7 @@ Subnet delegation enables you to designate a specific subnet for an Azure PaaS s
 This module supports enabling the service delegation of your choosing under the virtual network and with the specified subnet.  For more information, check the [terraform resource documentation](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#service_delegation).
 
 ```
-module "vnet" {
+module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # .... omitted
@@ -214,7 +214,7 @@ Network policies, like network security groups (NSG), are not supported for Priv
 This module Enable or Disable network policies for the private link endpoint on the subnet. The default value is `false`. If you are enabling the Private Link Endpoints on the subnet you shouldn't use Private Link Services as it's conflicts. 
 
 ```
-module "vnet" {
+module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # .... omitted
@@ -243,7 +243,7 @@ In order to deploy a Private Link Service on a given subnet, you must set the `e
 This module Enable or Disable network policies for the private link service on the subnet. The default value is `false`. If you are enabling the Private Link service on the subnet then, you shouldn't use Private Link endpoints as it's conflicts. 
 
 ```
-module "vnet" {
+module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # .... omitted
@@ -280,7 +280,7 @@ In the Source and Destination columns, `VirtualNetwork`, `AzureLoadBalancer`, an
 *You cannot remove the default rules, but you can override them by creating rules with higher priorities.*
 
 ```
-module "vnet" {
+module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # .... omitted
@@ -349,7 +349,7 @@ Start Date of the project|Date when this application, workload, or service was f
 > This module allows you to manage the above metadata tags directly or as a variable using `variables.tf`. All Azure resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag `ResourceName` is added automatically to all resources. 
 
 ```
-module "vnet" {
+module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
   create_resource_group   = true
 

@@ -5,7 +5,7 @@ This module deploys a hub network using the [Microsoft recommended Hub-Spoke net
 ## Module Usage
 
 ```
-module "vnet" {
+module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # By default, this module will create a resource group, proivde the name here 
