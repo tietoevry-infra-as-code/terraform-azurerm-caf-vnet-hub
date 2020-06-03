@@ -50,7 +50,7 @@ resource "azurerm_network_ddos_protection_plan" "ddos" {
   name                = lower("${var.project_name}-ddos-protection-plan-${var.subscription_type}")
   resource_group_name = local.resource_group_name
   location            = local.location
-  tags                = merge({ "ResourceName" = lower("vnet-${var.project_name}-${var.subscription_type}-protection-plan") }, var.tags, )
+  tags                = merge({ "ResourceName" = lower("${var.project_name}-ddos-protection-plan-${var.subscription_type}") }, var.tags, )
 }
 
 #-------------------------------------
