@@ -29,7 +29,7 @@ These types of resources are supported:
 
 ## Module Usage
 
-```hcl
+```ruby
 module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
