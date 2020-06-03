@@ -113,8 +113,8 @@ Run `terraform destroy` when you don't need these resources.
 
 |Name | Description|
 |---- | -----------|
-`resource_group_name` | The name of the resource group in which resources are created
-`resource_group_id` | The id of the resource group in which resources are created
+`resource_group_name`| The name of the resource group in which resources are created
+`resource_group_id`| The id of the resource group in which resources are created
 `resource_group_location`| The location of the resource group in which resources are created
 `virtual_network_name` | The name of the virtual network.
 `virtual_network_id` |The virtual NetworkConfiguration ID.
@@ -133,5 +133,6 @@ Run `terraform destroy` when you don't need these resources.
 `storage_primary_access_key`|The primary access key for the storage account
 `log_analytics_workspace_name`|Specifies the name of the Log Analytics Workspace
 `log_analytics_workspace_id`|The resource id of the Log Analytics Workspace
+`log_analytics_customer_id`|The Workspace (or Customer) ID for the Log Analytics Workspace.
 `log_analytics_logs_retention_in_days`|The workspace data retention in days. Possible values range between 30 and 730
 `azure_monitor_logs_retention_in_days`|The Azure Monitoring data retention in days
