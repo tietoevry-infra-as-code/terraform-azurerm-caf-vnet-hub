@@ -112,3 +112,8 @@ output "log_analytics_workspace_id" {
   description = "Specifies the id of the Log Analytics Workspace"
   value       = azurerm_log_analytics_workspace.logws[0].id
 }
+
+output "log_analytics_customer_id" {
+  description = "The Workspace (or Customer) ID for the Log Analytics Workspace."
+  value       = azurerm_log_analytics_workspace.logws.0.workspace_id
+}

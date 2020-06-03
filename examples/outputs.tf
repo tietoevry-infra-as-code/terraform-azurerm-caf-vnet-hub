@@ -103,6 +103,11 @@ output "log_analytics_workspace_id" {
   value       = module.vnet-hub.log_analytics_workspace_id
 }
 
+output "log_analytics_customer_id" {
+  description = "The Workspace (or Customer) ID for the Log Analytics Workspace."
+  value       = module.vnet-hub.log_analytics_customer_id
+}
+
 output "azure_monitor_logs_retention_in_days" {
   description = "The Azure Monitoring data retention in days."
   value       = module.vnet-hub.azure_monitor_logs_retention_in_days
