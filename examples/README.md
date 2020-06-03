@@ -4,13 +4,13 @@ This module deploys a hub network using the [Microsoft recommended Hub-Spoke net
 
 ## Module Usage
 
-```
+```hcl
 module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
-  # By default, this module will create a resource group, proivde the name here 
-  # to use an existing resource group, specify the existing resource group name, 
-  # and set the argument to `create_resource_group = false`. Location will be same as existing RG. 
+  # By default, this module will create a resource group, proivde the name here
+  # to use an existing resource group, specify the existing resource group name,
+  # and set the argument to `create_resource_group = false`. Location will be same as existing RG.
   # RG name must follow Azure naming convention. ex.: rg-<App or project name>-<Subscription type>-<Region>-<###>
   # Resource group is named like this: rg-tieto-internal-prod-westeurope-001
   create_resource_group = true
@@ -86,7 +86,7 @@ module "vnet-hub" {
   }
 
   # Adding TAG's to your Azure resources (Required)
-  # ProjectName and Env are already declared above, to use them here, create a varible. 
+  # ProjectName and Env are already declared above, to use them here, create a varible.
   tags = {
     ProjectName  = "tieto-internal"
     Env          = "dev"
@@ -101,10 +101,10 @@ module "vnet-hub" {
 
 To run this example you need to execute following Terraform commands
 
-```
-$ terraform init
-$ terraform plan
-$ terraform apply
+```hcl
+terraform init
+terraform plan
+terraform apply
 ```
 
 Run `terraform destroy` when you don't need these resources.
