@@ -420,6 +420,7 @@ Name | Description | Type | Default
 `storage_primary_access_key`|The primary access key for the storage account
 `log_analytics_workspace_name`|Specifies the name of the Log Analytics Workspace
 `log_analytics_workspace_id`|The resource id of the Log Analytics Workspace
+`log_analytics_customer_id`|The Workspace (or Customer) ID for the Log Analytics Workspace.
 `log_analytics_logs_retention_in_days`|The workspace data retention in days. Possible values range between 30 and 730
 `azure_monitor_logs_retention_in_days`|The Azure Monitoring data retention in days
 
