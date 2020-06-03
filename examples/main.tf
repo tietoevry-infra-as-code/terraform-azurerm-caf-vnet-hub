@@ -1,3 +1,5 @@
+# Please read the README.md file for complete details. 
+# use locals to define repeated blocks to configure the same values across multiple modules. 
 module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
@@ -20,7 +22,7 @@ module "vnet-hub" {
   private_dns_zone_name = "publiccloud.tieto.com"
 
   # (Required) To enable Azure Monitoring and flow logs
-  # Possible values range between 30 and 730
+  # Log Retention in days - Possible values range between 30 and 730
   log_analytics_workspace_sku          = "PerGB2018"
   log_analytics_logs_retention_in_days = 30
   azure_monitor_logs_retention_in_days = 30
