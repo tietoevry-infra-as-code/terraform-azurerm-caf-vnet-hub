@@ -29,13 +29,13 @@ These types of resources are supported:
 
 ## Module Usage
 
-```
+```hcl
 module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
-  # By default, this module will create a resource group, proivde the name here 
-  # to use an existing resource group, specify the existing resource group name, 
-  # and set the argument to `create_resource_group = false`. Location will be same as existing RG. 
+  # By default, this module will create a resource group, proivde the name here
+  # to use an existing resource group, specify the existing resource group name,
+  # and set the argument to `create_resource_group = false`. Location will be same as existing RG.
   # RG name must follow Azure naming convention. ex.: rg-<App or project name>-<Subscription type>-<Region>-<###>
   # Resource group is named like this: rg-tieto-internal-prod-westeurope-001
   create_resource_group = true
@@ -111,7 +111,7 @@ module "vnet-hub" {
   }
 
   # Adding TAG's to your Azure resources (Required)
-  # ProjectName and Env are already declared above, to use them here, create a varible. 
+  # ProjectName and Env are already declared above, to use them here, create a varible.
   tags = {
     ProjectName  = "tieto-internal"
     Env          = "dev"
@@ -126,7 +126,7 @@ module "vnet-hub" {
 
 By default, this module will create a resource group and the name of the resource group to be given in an argument `resource_group_name`. If you want to use an existing resource group, specify the existing resource group name, and set the argument to `create_resource_group = false`.
 
-> #### *If you are using an existing resource group, then this module uses the same resource group location to create all resources in this module.*
+> *If you are using an existing resource group, then this module uses the same resource group location to create all resources in this module.*
 
 ## Azure Network DDoS Protection Plan
 
@@ -138,8 +138,8 @@ This module handles the creation and a list of address spaces for subnets. This 
 
 This module creates 4 subnets by default: Gateway Subnet, AzureFirewallSubnet, and Management Subnet.
 
-Name | Description 
----- | ----------- 
+Name | Description
+---- | -----------
 Gateway Subnet| Contain VPN Gateway, Express route Gateway
 AzureFirewallSubnet|If added the Firewall module, it Deploys an Azure Firewall that will monitor all incoming and outgoing traffic
 ApplicationGateway|Contain an Application Gateway etc...
@@ -153,13 +153,13 @@ Service Endpoints allows connecting certain platform services into virtual netwo
 
 This module supports enabling the service endpoint of your choosing under the virtual network and with the specified subnet. The list of Service endpoints to associate with the subnet values include: `Microsoft.AzureActiveDirectory`, `Microsoft.AzureCosmosDB`, `Microsoft.ContainerRegistry`, `Microsoft.EventHub`, `Microsoft.KeyVault`, `Microsoft.ServiceBus`, `Microsoft.Sql`, `Microsoft.Storage` and `Microsoft.Web`.
 
-```
+```hcl
 module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # .... omitted
 
-  # Multiple Subnets, Service delegation, Service Endpoints 
+  # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     mgnt_subnet = {
       subnet_name           = "management"
@@ -180,13 +180,13 @@ Subnet delegation enables you to designate a specific subnet for an Azure PaaS s
 
 This module supports enabling the service delegation of your choosing under the virtual network and with the specified subnet.  For more information, check the [terraform resource documentation](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#service_delegation).
 
-```
+```hcl
 module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # .... omitted
 
-  # Multiple Subnets, Service delegation, Service Endpoints 
+  # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     mgnt_subnet = {
       subnet_name           = "management"
@@ -209,17 +209,17 @@ module "vnet-hub" {
 
 ## `enforce_private_link_endpoint_network_policies` - Private Link Endpoint on the subnet
 
-Network policies, like network security groups (NSG), are not supported for Private Link Endpoints=. In order to deploy a Private Link Endpoint on a given subnet, you must set the `enforce_private_link_endpoint_network_policies` attribute to `true`. This setting is only applicable for the Private Link Endpoint, for all other resources in the subnet access is controlled based via the Network Security Group which can be configured using the `azurerm_subnet_network_security_group_association` resource. 
+Network policies, like network security groups (NSG), are not supported for Private Link Endpoints=. In order to deploy a Private Link Endpoint on a given subnet, you must set the `enforce_private_link_endpoint_network_policies` attribute to `true`. This setting is only applicable for the Private Link Endpoint, for all other resources in the subnet access is controlled based via the Network Security Group which can be configured using the `azurerm_subnet_network_security_group_association` resource.
 
-This module Enable or Disable network policies for the private link endpoint on the subnet. The default value is `false`. If you are enabling the Private Link Endpoints on the subnet you shouldn't use Private Link Services as it's conflicts. 
+This module Enable or Disable network policies for the private link endpoint on the subnet. The default value is `false`. If you are enabling the Private Link Endpoints on the subnet you shouldn't use Private Link Services as it's conflicts.
 
-```
+```hcl
 module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # .... omitted
 
-  # Multiple Subnets, Service delegation, Service Endpoints 
+  # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     mgnt_subnet = {
       subnet_name           = "management"
@@ -240,15 +240,15 @@ module "vnet-hub" {
 
 In order to deploy a Private Link Service on a given subnet, you must set the `enforce_private_link_service_network_policies` attribute to `true`. This setting is only applicable for the Private Link Service, for all other resources in the subnet access is controlled based on the Network Security Group which can be configured using the `azurerm_subnet_network_security_group_association` resource.
 
-This module Enable or Disable network policies for the private link service on the subnet. The default value is `false`. If you are enabling the Private Link service on the subnet then, you shouldn't use Private Link endpoints as it's conflicts. 
+This module Enable or Disable network policies for the private link service on the subnet. The default value is `false`. If you are enabling the Private Link service on the subnet then, you shouldn't use Private Link endpoints as it's conflicts.
 
-```
+```hcl
 module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # .... omitted
 
-  # Multiple Subnets, Service delegation, Service Endpoints 
+  # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     mgnt_subnet = {
       subnet_name           = "management"
@@ -279,13 +279,13 @@ In the Source and Destination columns, `VirtualNetwork`, `AzureLoadBalancer`, an
 
 *You cannot remove the default rules, but you can override them by creating rules with higher priorities.*
 
-```
+```hcl
 module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # .... omitted
 
-  # Multiple Subnets, Service delegation, Service Endpoints 
+  # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     mgnt_subnet = {
       subnet_name           = "management"
@@ -310,7 +310,7 @@ module "vnet-hub" {
 
 ## Azure Monitoring Diagnostics
 
-Platform logs in Azure, including the Azure Activity log and resource logs, provide detailed diagnostic and auditing information for Azure resources and the Azure platform they depend on. Platform metrics are collected by default and typically stored in the Azure Monitor metrics database. This module enables to send all the logs and metrics to either storage account, event hub or Log Analytics workspace. 
+Platform logs in Azure, including the Azure Activity log and resource logs, provide detailed diagnostic and auditing information for Azure resources and the Azure platform they depend on. Platform metrics are collected by default and typically stored in the Azure Monitor metrics database. This module enables to send all the logs and metrics to either storage account, event hub or Log Analytics workspace.
 
 ## Peering
 
@@ -321,12 +321,15 @@ To peer spoke networks to the hub networks requires the service principal that p
 This module facilitates the private DNS zone for the virtual network.  To create a zone, set the domain name for the private DNS zone with variable `private_dns_zone_name`. This will additionally link the virtual network hub to the private DNS zone.  It will assign all principals that have peering access as contributors so, spokes can remain linked to the same zone.
 
 ## Recommended naming and tagging conventions
+
 Well-defined naming and metadata tagging conventions help to quickly locate and manage resources. These conventions also help associate cloud usage costs with business teams via chargeback and show back accounting mechanisms.
 
-> ### Resource naming 
+> ### Resource naming
+
 An effective naming convention assembles resource names by using important resource information as parts of a resource's name. For example, using these [recommended naming conventions](https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging#example-names), a public IP resource for a production SharePoint workload is named like this: `pip-sharepoint-prod-westus-001`.
 
 > ### Metadata tags
+
 When applying metadata tags to the cloud resources, you can include information about those assets that couldn't be included in the resource name. You can use that information to perform more sophisticated filtering and reporting on resources. This information can be used by IT or business teams to find resources or generate reports about resource usage and billing.
 
 The following list provides the recommended common tags that capture important context and information about resources. Use this list as a starting point to establish your tagging conventions.
@@ -335,20 +338,20 @@ Tag Name|Description|Key|Example Value|Required?
 --------|-----------|---|-------------|---------|
 Project Name|Name of the Project for the infra is created. This is mandatory to create a resource names.|ProjectName|{Project name}|Yes
 Application Name|Name of the application, service, or workload the resource is associated with.|ApplicationName|{app name}|Yes
-Approver|Name	Person responsible for approving costs related to this resource.|Approver|{email}|Yes
+Approver|Name Person responsible for approving costs related to this resource.|Approver|{email}|Yes
 Business Unit|Top-level division of your company that owns the subscription or workload the resource belongs to. In smaller organizations, this may represent a single corporate or shared top-level organizational element.|BusinessUnit|FINANCE, MARKETING,{Product Name},CORP,SHARED|Yes
 Cost Center|Accounting cost center associated with this resource.|CostCenter|{number}|Yes
 Disaster Recovery|Business criticality of this application, workload, or service.|DR|Mission Critical, Critical, Essential|Yes
 End Date of the Project|Date when this application, workload, or service is planned to be retired.|EndDate|{date}|No
 Environment|Deployment environment of this application, workload, or service.|Env|Prod, Dev, QA, Stage, Test|Yes
 Owner Name|Owner of the application, workload, or service.|Owner|{email}|Yes
-Requester Name|User that requested the creation of this application.|Requestor|	{email}|Yes
+Requester Name|User that requested the creation of this application.|Requestor| {email}|Yes
 Service Class|Service Level Agreement level of this application, workload, or service.|ServiceClass|Dev, Bronze, Silver, Gold|Yes
 Start Date of the project|Date when this application, workload, or service was first deployed.|StartDate|{date}|No
 
-> This module allows you to manage the above metadata tags directly or as a variable using `variables.tf`. All Azure resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag `ResourceName` is added automatically to all resources. 
+> This module allows you to manage the above metadata tags directly or as a variable using `variables.tf`. All Azure resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag `ResourceName` is added automatically to all resources.
 
-```
+```hcl
 module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
   create_resource_group   = true
@@ -380,7 +383,7 @@ Name | Description | Type | Default
 `dns_servers` | List of DNS servers to use for virtual network | list |`[]`
 `subnets`|For each subnet, create an object that contain fields|object|`{}`
 `subnet_name`|A name of subnets inside virtual network| object |`{}`
-`subnet_address_prefix`|A list of subnets address prefixes inside virtual network| 
+`subnet_address_prefix`|A list of subnets address prefixes inside virtual network|
 `delegation`|defines a subnet delegation feature. takes an object as described in the following example|object|`{}`
 `service_endpoints`|service endpoints for the virtual subnet|object|`{}`
 `nsg_inbound_rule`|network security groups settings - a NSG is always created for each subnet|object|`{}`
@@ -388,7 +391,7 @@ Name | Description | Type | Default
 `private_dns_zone_name`|The name of the Private DNS Zone. Must be a valid domain name to enable the resource creation|string|`""`
 `create_network_watcher`|Controls if Network Watcher resources should be created for the Azure subscription |string|`"true"`
 `enable_network_watcher_flow_logs`|Manages a Network Watcher Flow Logs|string|`"true"`
-`log_analytics_workspace_sku`|The Sku of the Log Analytics Workspace. Possible values are `Free`, `PerNode`, `Premium`, `Standard`, `Standalone`, `Unlimited`, and `PerGB2018`|string|`PerGB2018`
+`log_analytics_workspace_sku`|The SKU of the Log Analytics Workspace. Possible values are `Free`, `PerNode`, `Premium`, `Standard`, `Standalone`, `Unlimited`, and `PerGB2018`|string|`PerGB2018`
 `log_analytics_logs_retention_in_days`|The log analytics workspace data retention in days. Possible values range between `30` and `730`|number|`30`
 `azure_monitor_logs_retention_in_days`|The Azure Monitoring data retention in days|number|`30`
 `Tags`|A map of tags to add to all resources|map|`{}`
@@ -397,8 +400,8 @@ Name | Description | Type | Default
 
 |Name | Description|
 |---- | -----------|
-`resource_group_name` | The name of the resource group in which resources are created
-`resource_group_id` | The id of the resource group in which resources are created
+`resource_group_name`| The name of the resource group in which resources are created
+`resource_group_id`| The id of the resource group in which resources are created
 `resource_group_location`| The location of the resource group in which resources are created
 `virtual_network_name` | The name of the virtual network.
 `virtual_network_id` |The virtual NetworkConfiguration ID.

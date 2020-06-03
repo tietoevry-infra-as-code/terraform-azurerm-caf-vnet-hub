@@ -208,14 +208,23 @@ resource "azurerm_storage_account" "storeacc" {
   tags                      = merge({ "ResourceName" = format("%s%s", lower(replace(var.project_name, "/[[:^alnum:]]/", "")), "stdiaglogs") }, var.tags, )
 }
 
+resource "random_string" "main" {
+  length  = 8
+  special = false
+  keepers = {
+    name = var.project_name
+  }
+}
+
+
 resource "azurerm_log_analytics_workspace" "logws" {
   count               = var.enable_network_watcher_flow_logs ? 1 : 0
-  name                = lower("log-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}")
+  name                = lower("log-${random_string.main.result}-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}")
   resource_group_name = local.resource_group_name
   location            = local.location
   sku                 = var.log_analytics_workspace_sku
   retention_in_days   = var.log_analytics_logs_retention_in_days
-  tags                = merge({ "ResourceName" = lower("log-${var.project_name}-${var.subscription_type}-${var.environment}") }, var.tags, )
+  tags                = merge({ "ResourceName" = lower("log-${random_string.main.result}-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}") }, var.tags, )
 }
 
 resource "azurerm_network_watcher_flow_log" "nwflog" {
