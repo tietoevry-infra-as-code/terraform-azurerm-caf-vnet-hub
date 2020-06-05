@@ -79,28 +79,33 @@ output "private_dns_zone_id" {
 
 output "storage_account_id" {
   description = "The ID of the storage account."
-  value       = azurerm_storage_account.storeacc[0].id
+  value       = azurerm_storage_account.storeacc.id
 }
 
 output "storage_account_name" {
   description = "The name of the storage account."
-  value       = azurerm_storage_account.storeacc[0].name
+  value       = azurerm_storage_account.storeacc.name
 }
 
 output "storage_primary_access_key" {
   sensitive   = true
   description = "The primary access key for the storage account."
-  value       = azurerm_storage_account.storeacc[0].primary_access_key
+  value       = azurerm_storage_account.storeacc.primary_access_key
 }
 
 output "log_analytics_workspace_name" {
   description = "Specifies the name of the Log Analytics Workspace"
-  value       = azurerm_log_analytics_workspace.logws[0].name
+  value       = azurerm_log_analytics_workspace.logws.name
 }
 
-output "azure_monitor_logs_retention_in_days" {
-  description = "The Azure Monitoring data retention in days."
-  value       = var.azure_monitor_logs_retention_in_days
+output "log_analytics_workspace_id" {
+  description = "Specifies the id of the Log Analytics Workspace"
+  value       = azurerm_log_analytics_workspace.logws.id
+}
+
+output "log_analytics_customer_id" {
+  description = "The Workspace (or Customer) ID for the Log Analytics Workspace."
+  value       = azurerm_log_analytics_workspace.logws.workspace_id
 }
 
 output "log_analytics_logs_retention_in_days" {
@@ -108,12 +113,7 @@ output "log_analytics_logs_retention_in_days" {
   value       = var.log_analytics_logs_retention_in_days
 }
 
-output "log_analytics_workspace_id" {
-  description = "Specifies the id of the Log Analytics Workspace"
-  value       = azurerm_log_analytics_workspace.logws[0].id
-}
-
-output "log_analytics_customer_id" {
-  description = "The Workspace (or Customer) ID for the Log Analytics Workspace."
-  value       = azurerm_log_analytics_workspace.logws.0.workspace_id
+output "azure_monitor_logs_retention_in_days" {
+  description = "The Azure Monitoring data retention in days."
+  value       = var.azure_monitor_logs_retention_in_days
 }

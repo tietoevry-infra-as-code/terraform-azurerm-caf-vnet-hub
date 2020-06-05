@@ -2,6 +2,8 @@
 
 This module deploys a hub network using the [Microsoft recommended Hub-Spoke network topology](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke). Usually, only one hub in each region with multiple spokes and each of them can also be in separate subscriptions.
 
+This is designed to quickly deploy hub and spoke architecture in the azure and further security hardening would be recommend to add appropriate NSG rules to use this for any production workloads.
+
 ## Module Usage
 
 ```hcl
@@ -12,10 +14,9 @@ module "vnet-hub" {
   # to use an existing resource group, specify the existing resource group name,
   # and set the argument to `create_resource_group = false`. Location will be same as existing RG.
   # RG name must follow Azure naming convention. ex.: rg-<App or project name>-<Subscription type>-<Region>-<###>
-  # Resource group is named like this: rg-tieto-internal-prod-westeurope-001
-  create_resource_group = true
-  resource_group_name   = "rg-tieto-internal-shared-westeurope-001"
-  location              = "westeurope"
+  # Resource group is named like this: rg-hub-tieto-internal-prod-westeurope-001
+  resource_group_name = "rg-hub-tieto-internal-shared-westeurope-001"
+  location            = "westeurope"
 
   # (Required) Project_Name, Subscription_type and environment are must to create resource names.
   project_name      = "tieto-internal"
@@ -27,7 +28,7 @@ module "vnet-hub" {
   private_dns_zone_name = "publiccloud.tieto.com"
 
   # (Required) To enable Azure Monitoring and flow logs
-  # Possible values range between 30 and 730
+  # Log Retention in days - Possible values range between 30 and 730
   log_analytics_workspace_sku          = "PerGB2018"
   log_analytics_logs_retention_in_days = 30
   azure_monitor_logs_retention_in_days = 30

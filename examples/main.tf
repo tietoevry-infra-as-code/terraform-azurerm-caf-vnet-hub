@@ -3,14 +3,13 @@
 module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
-  # By default, this module will create a resource group, proivde the name here 
+  # By default, this module will create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name, 
   # and set the argument to `create_resource_group = false`. Location will be same as existing RG. 
   # RG name must follow Azure naming convention. ex.: rg-<App or project name>-<Subscription type>-<Region>-<###>
-  # Resource group is named like this: rg-tieto-internal-prod-westeurope-001
-  create_resource_group = true
-  resource_group_name   = "rg-tieto-internal-shared-westeurope-001"
-  location              = "westeurope"
+  # Resource group is named like this: rg-hub-tieto-internal-prod-westeurope-001
+  resource_group_name = "rg-hub-tieto-internal-shared-westeurope-001"
+  location            = "westeurope"
 
   # (Required) Project_Name, Subscription_type and environment are must to create resource names.
   project_name      = "tieto-internal"

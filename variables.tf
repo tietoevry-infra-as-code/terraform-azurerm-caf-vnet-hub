@@ -64,11 +64,6 @@ variable "private_dns_zone_name" {
   default     = null
 }
 
-variable "enable_network_watcher_flow_logs" {
-  description = "Manages a Network Watcher Flow Logs"
-  default     = true
-}
-
 variable "log_analytics_workspace_sku" {
   description = "The Sku of the Log Analytics Workspace. Possible values are Free, PerNode, Premium, Standard, Standalone, Unlimited, and PerGB2018"
   default     = "PerGB2018"

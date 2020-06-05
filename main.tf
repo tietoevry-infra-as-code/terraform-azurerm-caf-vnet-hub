@@ -57,11 +57,18 @@ resource "azurerm_network_ddos_protection_plan" "ddos" {
 # Network Watcher - Default is "true"
 #-------------------------------------
 
+resource "azurerm_resource_group" "nwatcher" {
+  count    = var.create_network_watcher != false ? 1 : 0
+  name     = "NetworkWatcherRG"
+  location = local.location
+  tags     = merge({ "ResourceName" = "NetworkWatcherRG" }, var.tags, )
+}
+
 resource "azurerm_network_watcher" "nwatcher" {
-  count               = var.create_network_watcher ? 1 : 0
+  count               = var.create_network_watcher != false ? 1 : 0
   name                = "NetworkWatcher_${local.location}"
   location            = local.location
-  resource_group_name = local.resource_group_name
+  resource_group_name = azurerm_resource_group.nwatcher.0.name
   tags                = merge({ "ResourceName" = format("%s", "NetworkWatcher_${local.location}") }, var.tags, )
 }
 
@@ -197,7 +204,6 @@ resource "azurerm_role_assignment" "dns" {
 # Network Watcher flow logs - Default is "true"
 #-----------------------------------------------
 resource "azurerm_storage_account" "storeacc" {
-  count                     = var.enable_network_watcher_flow_logs ? 1 : 0
   name                      = format("stdiaglogs%s", lower(replace(var.project_name, "/[[:^alnum:]]/", "")))
   resource_group_name       = local.resource_group_name
   location                  = local.location
@@ -216,9 +222,7 @@ resource "random_string" "main" {
   }
 }
 
-
 resource "azurerm_log_analytics_workspace" "logws" {
-  count               = var.enable_network_watcher_flow_logs ? 1 : 0
   name                = lower("log-${random_string.main.result}-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}")
   resource_group_name = local.resource_group_name
   location            = local.location
@@ -229,10 +233,10 @@ resource "azurerm_log_analytics_workspace" "logws" {
 
 resource "azurerm_network_watcher_flow_log" "nwflog" {
   for_each                  = var.subnets
-  network_watcher_name      = azurerm_network_watcher.nwatcher.0.name
-  resource_group_name       = local.resource_group_name
+  network_watcher_name      = azurerm_network_watcher.nwatcher[0].name
+  resource_group_name       = azurerm_resource_group.nwatcher[0].name # Must provide Netwatcher resource Group
   network_security_group_id = azurerm_network_security_group.nsg[each.key].id
-  storage_account_id        = azurerm_storage_account.storeacc.0.id
+  storage_account_id        = azurerm_storage_account.storeacc.id
   enabled                   = true
   version                   = 2
 
@@ -243,9 +247,9 @@ resource "azurerm_network_watcher_flow_log" "nwflog" {
 
   traffic_analytics {
     enabled               = true
-    workspace_id          = azurerm_log_analytics_workspace.logws.0.workspace_id
+    workspace_id          = azurerm_log_analytics_workspace.logws.workspace_id
     workspace_region      = local.location
-    workspace_resource_id = azurerm_log_analytics_workspace.logws.0.id
+    workspace_resource_id = azurerm_log_analytics_workspace.logws.id
     interval_in_minutes   = 10
   }
 }
@@ -258,8 +262,8 @@ resource "azurerm_network_watcher_flow_log" "nwflog" {
 resource "azurerm_monitor_diagnostic_setting" "vnet" {
   name                       = lower("vnet-${var.project_name}-diag")
   target_resource_id         = azurerm_virtual_network.vnet.id
-  storage_account_id         = azurerm_storage_account.storeacc.0.id
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.logws.0.id
+  storage_account_id         = azurerm_storage_account.storeacc.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.logws.id
 
   log {
     category = "VMProtectionAlerts"
@@ -284,8 +288,8 @@ resource "azurerm_monitor_diagnostic_setting" "nsg" {
   for_each                   = var.subnets
   name                       = lower("${each.key}-diag")
   target_resource_id         = azurerm_network_security_group.nsg[each.key].id
-  storage_account_id         = azurerm_storage_account.storeacc.0.id
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.logws.0.id
+  storage_account_id         = azurerm_storage_account.storeacc.id
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.logws.id
 
   dynamic "log" {
     for_each = var.nsg_diag_logs

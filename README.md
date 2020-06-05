@@ -4,7 +4,9 @@ This module deploys a hub network using the [Microsoft recommended Hub-Spoke net
 
 The following reference architecture shows how to implement a hub-spoke topology in Azure. The hub is a virtual network in Azure that acts as a central point of connectivity to an on-premises network. The spokes are virtual networks that peer with the hub and can be used to isolate workloads. Traffic flows between the on-premises datacenter and the hub through an ExpressRoute or VPN gateway connection.
 
-AzureFirewallSubnet and GatewaySubnet will not contain any UDR (User Defined Route) or NSG (Network Security Group). Management and DMZ will route all outgoing traffic through firewall instance.
+AzureFirewallSubnet and GatewaySubnet will not contain any UDR (User Defined Route) or NSG (Network Security Group). Management and DMZ will route all outgoing traffic through firewall instance. This is designed to quickly deploy hub and spoke architecture in the azure and further security hardening would recommend to add appropriate NSG rules to use this for any production workloads.
+
+This is designed to quickly deploy hub and spoke architecture in the azure and further security hardening would be recommend to add appropriate NSG rules to use this for any production workloads.
 
 ![enter image description here](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/images/hub-spoke.png)
 
@@ -37,10 +39,9 @@ module "vnet-hub" {
   # to use an existing resource group, specify the existing resource group name,
   # and set the argument to `create_resource_group = false`. Location will be same as existing RG.
   # RG name must follow Azure naming convention. ex.: rg-<App or project name>-<Subscription type>-<Region>-<###>
-  # Resource group is named like this: rg-tieto-internal-prod-westeurope-001
-  create_resource_group = true
-  resource_group_name   = "rg-tieto-internal-shared-westeurope-001"
-  location              = "westeurope"
+  # Resource group is named like this: rg-hub-tieto-internal-prod-westeurope-001
+  resource_group_name = "rg-hub-tieto-internal-shared-westeurope-001"
+  location            = "westeurope"
 
   # (Required) Project_Name, Subscription_type and environment are must to create resource names.
   project_name      = "tieto-internal"
@@ -52,7 +53,7 @@ module "vnet-hub" {
   private_dns_zone_name = "publiccloud.tieto.com"
 
   # (Required) To enable Azure Monitoring and flow logs
-  # Possible values range between 30 and 730
+  # Log Retention in days - Possible values range between 30 and 730
   log_analytics_workspace_sku          = "PerGB2018"
   log_analytics_logs_retention_in_days = 30
   azure_monitor_logs_retention_in_days = 30
@@ -130,7 +131,7 @@ By default, this module will create a resource group and the name of the resourc
 
 ## Azure Network DDoS Protection Plan
 
-By default, this module will create a DDoS Protection Plan. You can enable/disable it by appending an argument `create_ddos_plan`. If you want to disable a DDoS plan using this module, set argument `create_ddos_plan = false`
+By default, this module will create a DDoS Protection Plan. You can enable/disable it by appending an argument `create_ddos_plan`. If you want to disable a DDoS plan using this module, set argument `create_ddos_plan = false`.
 
 ## Subnets
 
@@ -174,7 +175,7 @@ module "vnet-hub" {
 }
 ```
 
-## Subnet Service Endpoints
+## Subnet Service Delegation
 
 Subnet delegation enables you to designate a specific subnet for an Azure PaaS service of your choice that needs to be injected into your virtual network. The Subnet delegation provides full control to manage the integration of Azure services into virtual networks.
 
@@ -265,12 +266,6 @@ module "vnet-hub" {
 }
 ```
 
-## Network Watcher
-
-This module handle the provision of Network Watcher. Note that you cannot create more than one network watcher resource per subscription in any region.
-
-By default, this enabled to create the necessary resources in that region. You can exclude this from the Terraform plan using `create_network_watcher = false` argument in case you already have a network watcher available in your subscription.
-
 ## Network Security Groups
 
 By default, the network security groups connected to Management and ApplicationGateway will only allow necessary traffic and block everything else (deny-all rule). Use `nsg_inbound_rules` and `nsg_outbound_rules` in this Terraform module to create a Network Security Group (NSG) for each subnet and allow it to add additional rules for inbound flows.
@@ -308,6 +303,10 @@ module "vnet-hub" {
 }
 ```
 
+## Network Watcher
+
+This module handle the provision of Network Watcher resource by defining `create_network_watcher` variable. It will enable network watcher, flow logs and traffic analytics for all the subnets in the Virtual Network. Since Azure uses a specific naming standard on network watchers, It will create a resource group `NetworkWatcherRG` and adds the location specific resource.
+
 ## Azure Monitoring Diagnostics
 
 Platform logs in Azure, including the Azure Activity log and resource logs, provide detailed diagnostic and auditing information for Azure resources and the Azure platform they depend on. Platform metrics are collected by default and typically stored in the Azure Monitor metrics database. This module enables to send all the logs and metrics to either storage account, event hub or Log Analytics workspace.
@@ -342,12 +341,12 @@ Approver|Name Person responsible for approving costs related to this resource.|A
 Business Unit|Top-level division of your company that owns the subscription or workload the resource belongs to. In smaller organizations, this may represent a single corporate or shared top-level organizational element.|BusinessUnit|FINANCE, MARKETING,{Product Name},CORP,SHARED|Yes
 Cost Center|Accounting cost center associated with this resource.|CostCenter|{number}|Yes
 Disaster Recovery|Business criticality of this application, workload, or service.|DR|Mission Critical, Critical, Essential|Yes
-End Date of the Project|Date when this application, workload, or service is planned to be retired.|EndDate|{date}|No
 Environment|Deployment environment of this application, workload, or service.|Env|Prod, Dev, QA, Stage, Test|Yes
 Owner Name|Owner of the application, workload, or service.|Owner|{email}|Yes
 Requester Name|User that requested the creation of this application.|Requestor| {email}|Yes
 Service Class|Service Level Agreement level of this application, workload, or service.|ServiceClass|Dev, Bronze, Silver, Gold|Yes
 Start Date of the project|Date when this application, workload, or service was first deployed.|StartDate|{date}|No
+End Date of the Project|Date when this application, workload, or service is planned to be retired.|EndDate|{date}|No
 
 > This module allows you to manage the above metadata tags directly or as a variable using `variables.tf`. All Azure resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag `ResourceName` is added automatically to all resources.
 
@@ -359,7 +358,7 @@ module "vnet-hub" {
   # ... omitted
 
   tags = {
-    ProjectName  = "PublicCloud"
+    ProjectName  = "tieto-internal"
     Env          = "dev"
     Owner        = "user@example.com"
     BusinessUnit = "CORP"
@@ -372,15 +371,16 @@ module "vnet-hub" {
 
 Name | Description | Type | Default
 ---- | ----------- | ---- | -------
-`create_resource_group` | Whether to create resource group and use it for all networking resources | string | `"false"`
+`create_resource_group` | Whether to create resource group and use it for all networking resources | string | `"true"`
 `resource_group_name` | The name of the resource group in which resources are created | string | `""`
 `location`|The location of the resource group in which resources are created| string | `""`
 `project_name`|The name of the project|string | `""`
-`subscription_type`|Summary description of the purpose of the subscription that contains the resource. Often broken down by deployment environment type or specific workloads|string | `""`
+`subscription_type`|Summary description of the purpose of the subscription that contains the resource. Often broken down by deployment environment type or specific workloads. For example, Training, FINANCE, MARKETING, CORP, SHARED|string |`""`
 `environment`|The stage of the development lifecycle for the workload that the resource supports|list |`{}`
 `vnet_address_space`|Virtual Network address space to be used |list|`[]`
 `create_ddos_plan` | Controls if DDoS protection plan should be created | string | `"false"`
 `dns_servers` | List of DNS servers to use for virtual network | list |`[]`
+`create_network_watcher`|Controls if Network Watcher resources should be created for the Azure subscription |string|`"true"`
 `subnets`|For each subnet, create an object that contain fields|object|`{}`
 `subnet_name`|A name of subnets inside virtual network| object |`{}`
 `subnet_address_prefix`|A list of subnets address prefixes inside virtual network|
@@ -389,8 +389,6 @@ Name | Description | Type | Default
 `nsg_inbound_rule`|network security groups settings - a NSG is always created for each subnet|object|`{}`
 `nsg_outbound_rule`|network security groups settings - a NSG is always created for each subnet|object|`{}`
 `private_dns_zone_name`|The name of the Private DNS Zone. Must be a valid domain name to enable the resource creation|string|`""`
-`create_network_watcher`|Controls if Network Watcher resources should be created for the Azure subscription |string|`"true"`
-`enable_network_watcher_flow_logs`|Manages a Network Watcher Flow Logs|string|`"true"`
 `log_analytics_workspace_sku`|The SKU of the Log Analytics Workspace. Possible values are `Free`, `PerNode`, `Premium`, `Standard`, `Standalone`, `Unlimited`, and `PerGB2018`|string|`PerGB2018`
 `log_analytics_logs_retention_in_days`|The log analytics workspace data retention in days. Possible values range between `30` and `730`|number|`30`
 `azure_monitor_logs_retention_in_days`|The Azure Monitoring data retention in days|number|`30`
