@@ -56,23 +56,17 @@ module "vnet-hub" {
   # Log Retention in days - Possible values range between 30 and 730
   log_analytics_workspace_sku          = "PerGB2018"
   log_analytics_logs_retention_in_days = 30
-  azure_monitor_logs_retention_in_days = 30
 
   # Adding Standard DDoS Plan, and custom DNS servers (Optional)
   dns_servers = []
 
   # Multiple Subnets, Service delegation, Service Endpoints, Network security groups
   # These are default subnets with required configuration, check README.md for more details
-  # Route_table and NSG association to be added automatically for all subnets listed here.
+  # NSG association to be added automatically for all subnets listed here.
+  # First two address ranges from VNet Address space reserved for Gateway And Firewall Subnets.
+  # ex.: For 10.1.0.0/16 address space, usable address range start from 10.1.2.0/24 for all subnets.
   # subnet name will be set as per Azure naming convention by defaut. expected value here is: <App or project name>
   subnets = {
-
-    gw_subnet = {
-      subnet_name           = "gateway"
-      subnet_address_prefix = ["10.1.1.0/24"]
-      service_endpoints     = ["Microsoft.Storage"]
-    }
-
     mgnt_subnet = {
       subnet_name           = "management"
       subnet_address_prefix = ["10.1.2.0/24"]
@@ -135,7 +129,7 @@ By default, this module will create a DDoS Protection Plan. You can enable/disab
 
 ## Custom DNS servers
 
-This is an optional feature and only applicable if you are using your own DNS servers superseding default DNS services provided by Azure. Set the argument `dns_servers = ["4.4.4.4"]` to enable this option. For multiple DNS servers, set the argument `dns_servers = ["4.4.4.4", "8.8.8.8"]`
+This is an optional feature and only applicable if you are using your own DNS servers superseding default DNS services provided by Azure.Set the argument `dns_servers = ["4.4.4.4"]` to enable this option. For multiple DNS servers, set the argument `dns_servers = ["4.4.4.4", "8.8.8.8"]`
 
 ## Subnets
 
@@ -283,7 +277,7 @@ module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
   # .... omitted
-
+  
   # Multiple Subnets, Service delegation, Service Endpoints
   subnets = {
     mgnt_subnet = {
@@ -394,7 +388,6 @@ Name | Description | Type | Default
 `private_dns_zone_name`|The name of the Private DNS Zone. Must be a valid domain name to enable the resource creation|string|`""`
 `log_analytics_workspace_sku`|The SKU of the Log Analytics Workspace. Possible values are `Free`, `PerNode`, `Premium`, `Standard`, `Standalone`, `Unlimited`, and `PerGB2018`|string|`PerGB2018`
 `log_analytics_logs_retention_in_days`|The log analytics workspace data retention in days. Possible values range between `30` and `730`|number|`30`
-`azure_monitor_logs_retention_in_days`|The Azure Monitoring data retention in days|number|`30`
 `Tags`|A map of tags to add to all resources|map|`{}`
 
 ## Outputs
@@ -423,7 +416,6 @@ Name | Description | Type | Default
 `log_analytics_workspace_id`|The resource id of the Log Analytics Workspace
 `log_analytics_customer_id`|The Workspace (or Customer) ID for the Log Analytics Workspace.
 `log_analytics_logs_retention_in_days`|The workspace data retention in days. Possible values range between 30 and 730
-`azure_monitor_logs_retention_in_days`|The Azure Monitoring data retention in days
 
 ## Resource Graph
 

@@ -75,6 +75,15 @@ resource "azurerm_network_watcher" "nwatcher" {
 #--------------------------------------------
 # Subnets Creation - Depends on VNET Resource
 #--------------------------------------------
+
+resource "azurerm_subnet" "gw_snet" {
+  name                 = lower(format("snet-%s-${var.subscription_type}-${local.location}", "gateway"))
+  resource_group_name  = local.resource_group_name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = [cidrsubnet(element(var.vnet_address_space, 0), 8, 1)]
+  service_endpoints    = ["Microsoft.Storage"]
+}
+
 resource "azurerm_subnet" "snet" {
   for_each             = var.subnets
   name                 = lower(format("snet-%s-${var.subscription_type}-${local.location}", each.value.subnet_name))
@@ -130,23 +139,6 @@ resource "azurerm_subnet_network_security_group_association" "nsg-assoc" {
   network_security_group_id = azurerm_network_security_group.nsg[each.key].id
 }
 
-#-----------------------------------------------
-# route_table for all subnets - Default is "true"
-#-----------------------------------------------
-
-resource "azurerm_route_table" "rtout" {
-  name                = "route-network-outbound"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  tags                = merge({ "ResourceName" = "route-network-outbound" }, var.tags, )
-}
-
-resource "azurerm_subnet_route_table_association" "rtassoc" {
-  for_each       = var.subnets
-  subnet_id      = azurerm_subnet.snet[each.key].id
-  route_table_id = azurerm_route_table.rtout.id
-}
-
 #----------------------------------------
 # Private DNS Zone - Default is "true"
 #----------------------------------------
@@ -168,7 +160,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "dzvlink" {
 }
 
 #----------------------------------------------------------------
-# Azure Role Assignment for Service Principal - Default is "true"
+# Azure Role Assignment for Service Principal - current user
 #-----------------------------------------------------------------
 data "azurerm_client_config" "current" {}
 
@@ -184,24 +176,8 @@ resource "azurerm_role_assignment" "dns" {
   principal_id         = data.azurerm_client_config.current.object_id
 }
 
-/* Need to work on multiple service principles, groups roles assignment. 
-  resource "azurerm_role_assignment" "peering" {
-  count                = length(var.service_principals)
-  scope                = azurerm_virtual_network.vnet.id
-  role_definition_name = "Network Contributor"
-  principal_id         = var.service_principals[count.index] 
-}
-
-resource "azurerm_role_assignment" "dns" {
-  count                = var.private_dns_zone_name != null ? length(var.service_principals) : 0
-  scope                = azurerm_private_dns_zone.dz[0].id
-  role_definition_name = "Private DNS Zone Contributor"
-  principal_id         = var.service_principals[count.index]
-}
-
-*/
 #-----------------------------------------------
-# Network Watcher flow logs - Default is "true"
+# Storage Account for Logs Archive
 #-----------------------------------------------
 resource "azurerm_storage_account" "storeacc" {
   name                      = format("stdiaglogs%s", lower(replace(var.project_name, "/[[:^alnum:]]/", "")))
@@ -211,8 +187,12 @@ resource "azurerm_storage_account" "storeacc" {
   account_tier              = "Standard"
   account_replication_type  = "GRS"
   enable_https_traffic_only = true
-  tags                      = merge({ "ResourceName" = format("%s%s", lower(replace(var.project_name, "/[[:^alnum:]]/", "")), "stdiaglogs") }, var.tags, )
+  tags                      = merge({ "ResourceName" = format("stdiaglogs%s", lower(replace(var.project_name, "/[[:^alnum:]]/", ""))) }, var.tags, )
 }
+
+#-----------------------------------------------
+# Log analytics workspace  for Logs analysis
+#-----------------------------------------------
 
 resource "random_string" "main" {
   length  = 8
@@ -223,13 +203,17 @@ resource "random_string" "main" {
 }
 
 resource "azurerm_log_analytics_workspace" "logws" {
-  name                = lower("log-${random_string.main.result}-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}")
+  name                = lower("logaws-${random_string.main.result}-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}")
   resource_group_name = local.resource_group_name
   location            = local.location
   sku                 = var.log_analytics_workspace_sku
   retention_in_days   = var.log_analytics_logs_retention_in_days
   tags                = merge({ "ResourceName" = lower("log-${random_string.main.result}-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}") }, var.tags, )
 }
+
+#-----------------------------------------------
+# Network flow logs for subnet and NSG
+#-----------------------------------------------
 
 resource "azurerm_network_watcher_flow_log" "nwflog" {
   for_each                  = var.subnets
@@ -239,10 +223,9 @@ resource "azurerm_network_watcher_flow_log" "nwflog" {
   storage_account_id        = azurerm_storage_account.storeacc.id
   enabled                   = true
   version                   = 2
-
   retention_policy {
     enabled = true
-    days    = var.log_analytics_logs_retention_in_days
+    days    = 0
   }
 
   traffic_analytics {
@@ -264,22 +247,19 @@ resource "azurerm_monitor_diagnostic_setting" "vnet" {
   target_resource_id         = azurerm_virtual_network.vnet.id
   storage_account_id         = azurerm_storage_account.storeacc.id
   log_analytics_workspace_id = azurerm_log_analytics_workspace.logws.id
-
   log {
     category = "VMProtectionAlerts"
     enabled  = true
 
     retention_policy {
-      enabled = true
-      days    = var.azure_monitor_logs_retention_in_days
+      enabled = false
     }
   }
   metric {
     category = "AllMetrics"
 
     retention_policy {
-      enabled = true
-      days    = var.azure_monitor_logs_retention_in_days
+      enabled = false
     }
   }
 }
@@ -298,8 +278,7 @@ resource "azurerm_monitor_diagnostic_setting" "nsg" {
       enabled  = true
 
       retention_policy {
-        enabled = true
-        days    = var.azure_monitor_logs_retention_in_days
+        enabled = false
       }
     }
   }

@@ -24,23 +24,17 @@ module "vnet-hub" {
   # Log Retention in days - Possible values range between 30 and 730
   log_analytics_workspace_sku          = "PerGB2018"
   log_analytics_logs_retention_in_days = 30
-  azure_monitor_logs_retention_in_days = 30
 
   # Adding Standard DDoS Plan, and custom DNS servers (Optional)
   dns_servers = []
 
   # Multiple Subnets, Service delegation, Service Endpoints, Network security groups
   # These are default subnets with required configuration, check README.md for more details
-  # Route_table and NSG association to be added automatically for all subnets listed here.
+  # NSG association to be added automatically for all subnets listed here.
+  # First two address ranges from VNet Address space reserved for Gateway And Firewall Subnets. 
+  # ex.: For 10.1.0.0/16 address space, usable address range start from 10.1.2.0/24 for all subnets.
   # subnet name will be set as per Azure naming convention by defaut. expected value here is: <App or project name>
   subnets = {
-
-    gw_subnet = {
-      subnet_name           = "gateway"
-      subnet_address_prefix = ["10.1.1.0/24"]
-      service_endpoints     = ["Microsoft.Storage"]
-    }
-
     mgnt_subnet = {
       subnet_name           = "management"
       subnet_address_prefix = ["10.1.2.0/24"]

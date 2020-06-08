@@ -57,17 +57,6 @@ output "network_watcher_id" {
   value       = module.vnet-hub.network_watcher_id
 }
 
-
-output "route_table_name" {
-  description = "The name of the route table"
-  value       = module.vnet-hub.route_table_name
-}
-
-output "route_table_id" {
-  description = "The resource id of the route table"
-  value       = module.vnet-hub.route_table_id
-}
-
 output "private_dns_zone_name" {
   description = "Enables you to manage Private DNS zones within Azure DNS. These zones are hosted on Azure's name servers."
   value       = module.vnet-hub.private_dns_zone_name
@@ -106,11 +95,6 @@ output "log_analytics_workspace_id" {
 output "log_analytics_customer_id" {
   description = "The Workspace (or Customer) ID for the Log Analytics Workspace."
   value       = module.vnet-hub.log_analytics_customer_id
-}
-
-output "azure_monitor_logs_retention_in_days" {
-  description = "The Azure Monitoring data retention in days."
-  value       = module.vnet-hub.azure_monitor_logs_retention_in_days
 }
 
 output "log_analytics_logs_retention_in_days" {

@@ -53,12 +53,6 @@ variable "subnets" {
   default     = {}
 }
 
-/*variable "service_principals" {
-  description = "List of principal ids that need access to peer to this Hub network. All service principals used to deploy spoke networks must have access to peer."
-  type        = list(string)
-  default     = []
-}*/
-
 variable "private_dns_zone_name" {
   description = "The name of the Private DNS zone"
   default     = null
@@ -71,11 +65,6 @@ variable "log_analytics_workspace_sku" {
 
 variable "log_analytics_logs_retention_in_days" {
   description = "The log analytics workspace data retention in days. Possible values range between 30 and 730."
-  default     = 30
-}
-
-variable "azure_monitor_logs_retention_in_days" {
-  description = "The Azure Monitoring data retention in days."
   default     = 30
 }
 

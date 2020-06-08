@@ -32,12 +32,12 @@ output "virtual_network_address_space" {
 
 output "subnet_ids" {
   description = "List of IDs of subnets"
-  value       = [for s in azurerm_subnet.snet : s.id]
+  value       = flatten(concat([for s in azurerm_subnet.snet : s.id], [azurerm_subnet.gw_snet.id]))
 }
 
 output "subnet_address_prefixes" {
   description = "List of address prefix for subnets"
-  value       = [for s in azurerm_subnet.snet : s.address_prefix]
+  value       = flatten(concat([for s in azurerm_subnet.snet : s.address_prefix], [azurerm_subnet.gw_snet.address_prefixes]))
 }
 
 # Network Security group ids
@@ -56,16 +56,6 @@ output "ddos_protection_plan_id" {
 output "network_watcher_id" {
   description = "ID of Network Watcher"
   value       = element(concat(azurerm_network_watcher.nwatcher.*.id, [""]), 0)
-}
-
-output "route_table_name" {
-  description = "The name of the route table"
-  value       = azurerm_route_table.rtout.name
-}
-
-output "route_table_id" {
-  description = "The resource id of the route table"
-  value       = azurerm_route_table.rtout.id
 }
 
 output "private_dns_zone_name" {
@@ -111,9 +101,4 @@ output "log_analytics_customer_id" {
 output "log_analytics_logs_retention_in_days" {
   description = "The workspace data retention in days. Possible values range between 30 and 730."
   value       = var.log_analytics_logs_retention_in_days
-}
-
-output "azure_monitor_logs_retention_in_days" {
-  description = "The Azure Monitoring data retention in days."
-  value       = var.azure_monitor_logs_retention_in_days
 }
