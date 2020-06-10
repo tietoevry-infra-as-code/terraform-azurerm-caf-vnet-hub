@@ -59,7 +59,7 @@ output "network_watcher_id" {
 }
 
 output "private_dns_zone_name" {
-  description = "The resource name of Private DNS zones within Azure DNS and Enables you to manage Private DNS zones within Azure DNS. These zones are hosted on Azure's name servers."
+  description = "The name of Private DNS zones within Azure DNS"
   value       = azurerm_private_dns_zone.dz[0].name
 }
 output "private_dns_zone_id" {

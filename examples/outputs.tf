@@ -58,11 +58,12 @@ output "network_watcher_id" {
 }
 
 output "private_dns_zone_name" {
-  description = "Enables you to manage Private DNS zones within Azure DNS. These zones are hosted on Azure's name servers."
+  description = "The name of the Private DNS zones within Azure DNS"
   value       = module.vnet-hub.private_dns_zone_name
 }
+
 output "private_dns_zone_id" {
-  description = "Enables you to manage Private DNS zones within Azure DNS. These zones are hosted on Azure's name servers."
+  description = "The resource id of Private DNS zones within Azure DNS"
   value       = module.vnet-hub.private_dns_zone_id
 }
 

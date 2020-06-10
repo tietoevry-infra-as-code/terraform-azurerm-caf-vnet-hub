@@ -1,5 +1,5 @@
 #---------------------------------------------------------
-# Resource Group Creation or selection - Default is "false"
+# Resource Group Creation or selection - Default is "true"
 #----------------------------------------------------------
 locals {
   resource_group_name = element(coalescelist(data.azurerm_resource_group.rgrp.*.name, azurerm_resource_group.rg.*.name, [""]), 0)
@@ -22,7 +22,6 @@ resource "azurerm_resource_group" "rg" {
 #-------------------------------------
 # VNET Creation - Default is "true"
 #-------------------------------------
-
 resource "azurerm_virtual_network" "vnet" {
   name                = lower("vnet-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}-01")
   location            = local.location
@@ -44,7 +43,6 @@ resource "azurerm_virtual_network" "vnet" {
 #--------------------------------------------
 # Ddos protection plan - Default is "false"
 #--------------------------------------------
-
 resource "azurerm_network_ddos_protection_plan" "ddos" {
   count               = var.create_ddos_plan ? 1 : 0
   name                = lower("${var.project_name}-ddos-protection-plan-${var.subscription_type}")
@@ -56,7 +54,6 @@ resource "azurerm_network_ddos_protection_plan" "ddos" {
 #-------------------------------------
 # Network Watcher - Default is "true"
 #-------------------------------------
-
 resource "azurerm_resource_group" "nwatcher" {
   count    = var.create_network_watcher != false ? 1 : 0
   name     = "NetworkWatcherRG"
@@ -72,10 +69,9 @@ resource "azurerm_network_watcher" "nwatcher" {
   tags                = merge({ "ResourceName" = format("%s", "NetworkWatcher_${local.location}") }, var.tags, )
 }
 
-#--------------------------------------------
-# Subnets Creation - Depends on VNET Resource
-#--------------------------------------------
-
+#--------------------------------------------------------------------------------------------------------
+# Subnets Creation with, private link endpoint/servie network policies, service endpoints and Deligation.
+#--------------------------------------------------------------------------------------------------------
 resource "azurerm_subnet" "gw_snet" {
   name                 = lower(format("snet-%s-${var.subscription_type}-${local.location}", "gateway"))
   resource_group_name  = local.resource_group_name
@@ -107,9 +103,9 @@ resource "azurerm_subnet" "snet" {
   }
 }
 
-#-----------------------------------------------
-# Network security group - Default is "false"
-#-----------------------------------------------
+#---------------------------------------------------------------
+# Network security group - NSG created for every subnet in VNet
+#---------------------------------------------------------------
 resource "azurerm_network_security_group" "nsg" {
   for_each            = var.subnets
   name                = lower("nsg_${each.key}_in")
@@ -142,7 +138,6 @@ resource "azurerm_subnet_network_security_group_association" "nsg-assoc" {
 #----------------------------------------
 # Private DNS Zone - Default is "true"
 #----------------------------------------
-
 resource "azurerm_private_dns_zone" "dz" {
   count               = var.private_dns_zone_name != null ? 1 : 0
   name                = var.private_dns_zone_name
@@ -193,7 +188,6 @@ resource "azurerm_storage_account" "storeacc" {
 #-----------------------------------------------
 # Log analytics workspace  for Logs analysis
 #-----------------------------------------------
-
 resource "random_string" "main" {
   length  = 8
   special = false
@@ -208,13 +202,12 @@ resource "azurerm_log_analytics_workspace" "logws" {
   location            = local.location
   sku                 = var.log_analytics_workspace_sku
   retention_in_days   = var.log_analytics_logs_retention_in_days
-  tags                = merge({ "ResourceName" = lower("log-${random_string.main.result}-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}") }, var.tags, )
+  tags                = merge({ "ResourceName" = lower("logaws-${random_string.main.result}-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}") }, var.tags, )
 }
 
-#-----------------------------------------------
+#-----------------------------------------
 # Network flow logs for subnet and NSG
-#-----------------------------------------------
-
+#-----------------------------------------
 resource "azurerm_network_watcher_flow_log" "nwflog" {
   for_each                  = var.subnets
   network_watcher_name      = azurerm_network_watcher.nwatcher[0].name
@@ -237,11 +230,9 @@ resource "azurerm_network_watcher_flow_log" "nwflog" {
   }
 }
 
-#----------------------------------------------------
-# azurerm monitoring diagnostics - Default is "true"
-#----------------------------------------------------
-# vpc, and all other resources. 
-
+#---------------------------------------------------------------
+# azurerm monitoring diagnostics - VNet, NSG, PIP, and Firewall
+#---------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "vnet" {
   name                       = lower("vnet-${var.project_name}-diag")
   target_resource_id         = azurerm_virtual_network.vnet.id

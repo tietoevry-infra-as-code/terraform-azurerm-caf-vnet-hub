@@ -4,11 +4,9 @@ This module deploys a hub network using the [Microsoft recommended Hub-Spoke net
 
 The following reference architecture shows how to implement a hub-spoke topology in Azure. The hub is a virtual network in Azure that acts as a central point of connectivity to an on-premises network. The spokes are virtual networks that peer with the hub and can be used to isolate workloads. Traffic flows between the on-premises datacenter and the hub through an ExpressRoute or VPN gateway connection.
 
-AzureFirewallSubnet and GatewaySubnet will not contain any UDR (User Defined Route) or NSG (Network Security Group). Management and DMZ will route all outgoing traffic through firewall instance.
-
 This is designed to quickly deploy hub and spoke architecture in the azure and further security hardening would be recommend to add appropriate NSG rules to use this for any production workloads.
 
-![enter image description here](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/images/hub-spoke.png)
+![hub-spoke-topology](azure-caf-hub-spoke.png)
 
 Source: [Microsoft Azure Hub-Spoke Topology Documentation](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke)
 
@@ -18,14 +16,14 @@ These types of resources are supported:
 * [Subnets](https://www.terraform.io/docs/providers/azurerm/r/subnet.html)
 * [Subnet Service Delegation](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#delegation)
 * [Virtual Network service endpoints](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#service_endpoints)
+* [Private Link service/Endpoint network policies on Subnet](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#enforce_private_link_endpoint_network_policies)
 * [AzureNetwork DDoS Protection Plan](https://www.terraform.io/docs/providers/azurerm/r/network_ddos_protection_plan.html)
-* [Network Watcher](https://www.terraform.io/docs/providers/azurerm/r/network_watcher.html)
 * [Network Security Groups](https://www.terraform.io/docs/providers/azurerm/r/network_security_group.html)
-* [Route Table](https://www.terraform.io/docs/providers/azurerm/r/route_table.html)
 * [Role Assignment for Peering](https://www.terraform.io/docs/providers/azurerm/r/role_assignment.html)
 * [Storage Account](https://www.terraform.io/docs/providers/azurerm/r/storage_account.html)
 * [Log Analytics Workspace](https://www.terraform.io/docs/providers/azurerm/r/log_analytics_workspace.html)
 * [Azure Monitoring Diagnostics](https://www.terraform.io/docs/providers/azurerm/r/monitor_diagnostic_setting.html)
+* [Network Watcher](https://www.terraform.io/docs/providers/azurerm/r/network_watcher.html)
 * [Network Watcher Workflow Logs](https://www.terraform.io/docs/providers/azurerm/r/network_watcher_flow_log.html)
 * [Private DNS Zone](https://www.terraform.io/docs/providers/azurerm/r/private_dns_zone.html)
 
@@ -208,7 +206,7 @@ module "vnet-hub" {
 
 ## `enforce_private_link_endpoint_network_policies` - Private Link Endpoint on the subnet
 
-Network policies, like network security groups (NSG), are not supported for Private Link Endpoints=. In order to deploy a Private Link Endpoint on a given subnet, you must set the `enforce_private_link_endpoint_network_policies` attribute to `true`. This setting is only applicable for the Private Link Endpoint, for all other resources in the subnet access is controlled based via the Network Security Group which can be configured using the `azurerm_subnet_network_security_group_association` resource.
+Network policies, like network security groups (NSG), are not supported for Private Link Endpoints. In order to deploy a Private Link Endpoint on a given subnet, you must set the `enforce_private_link_endpoint_network_policies` attribute to `true`. This setting is only applicable for the Private Link Endpoint, for all other resources in the subnet access is controlled based via the Network Security Group which can be configured using the `azurerm_subnet_network_security_group_association` resource.
 
 This module Enable or Disable network policies for the private link endpoint on the subnet. The default value is `false`. If you are enabling the Private Link Endpoints on the subnet you shouldn't use Private Link Services as it's conflicts.
 
@@ -346,7 +344,7 @@ Service Class|Service Level Agreement level of this application, workload, or se
 Start Date of the project|Date when this application, workload, or service was first deployed.|StartDate|{date}|No
 End Date of the Project|Date when this application, workload, or service is planned to be retired.|EndDate|{date}|No
 
-> This module allows you to manage the above metadata tags directly or as a variable using `variables.tf`. All Azure resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag `ResourceName` is added automatically to all resources.
+> This module allows you to manage the above metadata tags directly or as an variable using `variables.tf`. All Azure resources which support tagging can be tagged by specifying key-values in argument `tags`. Tag `ResourceName` is added automatically to all resources.
 
 ```hcl
 module "vnet-hub" {
@@ -407,7 +405,7 @@ Name | Description | Type | Default
 `network_watcher_id` | ID of Network Watcher
 `route_table_name`|The resource id of the route table
 `route_table_id`|The resource id of the route table
-`private_dns_zone_name`|The resource name of Private DNS zones within Azure DNS
+`private_dns_zone_name`|The name of Private DNS zones within Azure DNS
 `private_dns_zone_id`|The resource id of Private DNS zones within Azure DNS
 `storage_account_id`|The ID of the storage account
 `storage_account_name`|The name of the storage account
@@ -415,7 +413,7 @@ Name | Description | Type | Default
 `log_analytics_workspace_name`|Specifies the name of the Log Analytics Workspace
 `log_analytics_workspace_id`|The resource id of the Log Analytics Workspace
 `log_analytics_customer_id`|The Workspace (or Customer) ID for the Log Analytics Workspace.
-`log_analytics_logs_retention_in_days`|The workspace data retention in days. Possible values range between 30 and 730
+`log_analytics_logs_retention_in_days`|The log analytics workspace data retention in days. Possible values range between 30 and 730
 
 ## Resource Graph
 
