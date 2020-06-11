@@ -58,6 +58,16 @@ output "network_watcher_id" {
   value       = element(concat(azurerm_network_watcher.nwatcher.*.id, [""]), 0)
 }
 
+output "route_table_name" {
+  description = "The name of the route table"
+  value       = azurerm_route_table.rtout.name
+}
+
+output "route_table_id" {
+  description = "The resource id of the route table"
+  value       = azurerm_route_table.rtout.id
+}
+
 output "private_dns_zone_name" {
   description = "The name of Private DNS zones within Azure DNS"
   value       = azurerm_private_dns_zone.dz[0].name

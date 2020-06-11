@@ -57,6 +57,16 @@ output "network_watcher_id" {
   value       = module.vnet-hub.network_watcher_id
 }
 
+output "route_table_name" {
+  description = "The name of the route table"
+  value       = module.vnet-hub.route_table_name
+}
+
+output "route_table_id" {
+  description = "The resource id of the route table"
+  value       = module.vnet-hub.route_table_id
+}
+
 output "private_dns_zone_name" {
   description = "The name of the Private DNS zones within Azure DNS"
   value       = module.vnet-hub.private_dns_zone_name
