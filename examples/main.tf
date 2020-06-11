@@ -1,5 +1,3 @@
-# Please read the README.md file for complete details. 
-# use locals to define repeated blocks to configure the same values across multiple modules. 
 module "vnet-hub" {
   source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
 
@@ -46,7 +44,6 @@ module "vnet-hub" {
         ["weballow", "200", "Inbound", "Allow", "Tcp", "22", "*", ""],
         ["weballow1", "201", "Inbound", "Allow", "Tcp", "3389", "*", ""],
       ]
-
       nsg_outbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any value and to use this subnet as a source or destination prefix.
