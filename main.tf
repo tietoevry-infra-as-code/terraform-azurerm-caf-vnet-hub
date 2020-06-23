@@ -135,30 +135,6 @@ resource "azurerm_subnet_network_security_group_association" "nsg-assoc" {
   network_security_group_id = azurerm_network_security_group.nsg[each.key].id
 }
 
-#-------------------------------------------------
-# route_table to dirvert traffic through Firewall
-#-------------------------------------------------
-resource "azurerm_route_table" "rtout" {
-  name                = "route-network-outbound"
-  resource_group_name = local.resource_group_name
-  location            = local.location
-  tags                = merge({ "ResourceName" = "route-network-outbound" }, var.tags, )
-}
-
-resource "azurerm_subnet_route_table_association" "rtassoc" {
-  for_each       = var.subnets
-  subnet_id      = azurerm_subnet.snet[each.key].id
-  route_table_id = azurerm_route_table.rtout.id
-}
-
-resource "azurerm_route" "rtlocal" {
-  name                = lower("route-to-local-${var.project_name}-${var.location}")
-  resource_group_name = local.resource_group_name
-  route_table_name    = azurerm_route_table.rtout.name
-  address_prefix      = "0.0.0.0/0"
-  next_hop_type       = "VnetLocal"
-}
-
 #----------------------------------------
 # Private DNS Zone - Default is "true"
 #----------------------------------------

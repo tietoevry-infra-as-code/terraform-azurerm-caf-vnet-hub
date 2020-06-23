@@ -404,8 +404,6 @@ Name | Description | Type | Default
 `network_security_group_ids`|List of Network security groups and ids
 `ddos_protection_plan_id` | Azure Network DDoS protection plan id
 `network_watcher_id` | ID of Network Watcher
-`route_table_name`|The resource id of the route table
-`route_table_id`|The resource id of the route table
 `private_dns_zone_name`|The name of Private DNS zones within Azure DNS
 `private_dns_zone_id`|The resource id of Private DNS zones within Azure DNS
 `storage_account_id`|The ID of the storage account
@@ -427,5 +425,4 @@ Module is maintained by [Kumaraswamy Vithanala](mailto:kumaraswamy.vithanala@tie
 ## Other resources
 
 * [Hub-spoke network topology in Azure](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke)
-
 * [Terraform AzureRM Provider Documentation](https://www.terraform.io/docs/providers/azurerm/index.html)

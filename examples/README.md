@@ -119,8 +119,6 @@ Run `terraform destroy` when you don't need these resources.
 `network_security_group_ids`|List of Network security groups and ids
 `ddos_protection_plan_id` | Azure Network DDoS protection plan id
 `network_watcher_id` | ID of Network Watcher
-`route_table_name`|The resource id of the route table
-`route_table_id`|The resource id of the route table
 `private_dns_zone_name`|The resource name of Private DNS zones within Azure DNS
 `private_dns_zone_id`|The resource id of Private DNS zones within Azure DNS
 `storage_account_id`|The ID of the storage account
