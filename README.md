@@ -19,7 +19,6 @@ These types of resources are supported:
 * [Private Link service/Endpoint network policies on Subnet](https://www.terraform.io/docs/providers/azurerm/r/subnet.html#enforce_private_link_endpoint_network_policies)
 * [AzureNetwork DDoS Protection Plan](https://www.terraform.io/docs/providers/azurerm/r/network_ddos_protection_plan.html)
 * [Network Security Groups](https://www.terraform.io/docs/providers/azurerm/r/network_security_group.html)
-* [Route Table](https://www.terraform.io/docs/providers/azurerm/r/route_table.html)
 * [Role Assignment for Peering](https://www.terraform.io/docs/providers/azurerm/r/role_assignment.html)
 * [Storage Account](https://www.terraform.io/docs/providers/azurerm/r/storage_account.html)
 * [Log Analytics Workspace](https://www.terraform.io/docs/providers/azurerm/r/log_analytics_workspace.html)
