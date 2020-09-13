@@ -8,7 +8,7 @@ This is designed to quickly deploy hub and spoke architecture in the azure and f
 
 ```hcl
 module "vnet-hub" {
-  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
+  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v2.0.0"
 
   # By default, this module will create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name,
@@ -69,7 +69,7 @@ module "vnet-hub" {
       nsg_outbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any value and to use this subnet as a source or destination prefix.
-        ["ntp_out", "103", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0"],
+        ["ntp_out", "102", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0"],
       ]
     }
   }

@@ -31,7 +31,7 @@ These types of resources are supported:
 
 ```hcl
 module "vnet-hub" {
-  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
+  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v2.0.0"
 
   # By default, this module will create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name,
@@ -92,7 +92,7 @@ module "vnet-hub" {
       nsg_outbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any value and to use this subnet as a source or destination prefix.
-        ["ntp_out", "103", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0"],
+        ["ntp_out", "102", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0"],
       ]
     }
   }
@@ -146,7 +146,7 @@ This module supports enabling the service endpoint of your choosing under the vi
 
 ```hcl
 module "vnet-hub" {
-  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
+  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v2.0.0"
 
   # .... omitted
 
@@ -173,7 +173,7 @@ This module supports enabling the service delegation of your choosing under the 
 
 ```hcl
 module "vnet-hub" {
-  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
+  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v2.0.0"
 
   # .... omitted
 
@@ -206,7 +206,7 @@ This module Enable or Disable network policies for the private link endpoint on 
 
 ```hcl
 module "vnet-hub" {
-  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
+  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v2.0.0"
 
   # .... omitted
 
@@ -235,7 +235,7 @@ This module Enable or Disable network policies for the private link service on t
 
 ```hcl
 module "vnet-hub" {
-  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
+  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v2.0.0"
 
   # .... omitted
 
@@ -266,7 +266,7 @@ In the Source and Destination columns, `VirtualNetwork`, `AzureLoadBalancer`, an
 
 ```hcl
 module "vnet-hub" {
-  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
+  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v2.0.0"
 
   # .... omitted
   
@@ -342,13 +342,13 @@ End Date of the Project|Date when this application, workload, or service is plan
 
 ```hcl
 module "vnet-hub" {
-  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
+  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v2.0.0"
   create_resource_group   = true
 
   # ... omitted
 
   tags = {
-    ProjectName  = "tieto-internal"
+    ProjectName  = "demo-internal"
     Env          = "dev"
     Owner        = "user@example.com"
     BusinessUnit = "CORP"
@@ -361,14 +361,14 @@ module "vnet-hub" {
 
 Name | Version
 -----|--------
-terraform | >= 0.12.20
-azurerm | ~> 2.23
+terraform | >= 0.13
+azurerm | ~> 2.27.0
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-azurerm | ~> 2.23
+azurerm | ~> 2.27.0
 random | n/a
 
 ## Inputs
@@ -378,9 +378,7 @@ Name | Description | Type | Default
 `create_resource_group` | Whether to create resource group and use it for all networking resources | string | `true`
 `resource_group_name` | The name of the resource group in which resources are created | string | `""`
 `location`|The location of the resource group in which resources are created| string | `""`
-`project_name`|The name of the project|string | `""`
-`subscription_type`|Summary description of the purpose of the subscription that contains the resource. Often broken down by deployment environment type or specific workloads. For example, Training, FINANCE, MARKETING, CORP, SHARED|string |`""`
-`environment`|The stage of the development lifecycle for the workload that the resource supports|list |`{}`
+`gateway_subnet_address_prefix`|The address prefix to use for the gateway subnet|list|`null`
 `vnet_address_space`|Virtual Network address space to be used |list|`[]`
 `create_ddos_plan` | Controls if DDoS protection plan should be created | string | `true`
 `dns_servers` | List of DNS servers to use for virtual network | list |`[]`
