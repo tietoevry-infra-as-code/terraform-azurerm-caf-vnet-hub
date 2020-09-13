@@ -131,12 +131,12 @@ This module creates 4 subnets by default: Gateway Subnet, AzureFirewallSubnet, a
 
 Name | Description
 ---- | -----------
-Gateway Subnet| Contain VPN Gateway, Express route Gateway
+GatewaySubnet| Contain VPN Gateway, Express route Gateway
 AzureFirewallSubnet|If added the Firewall module, it Deploys an Azure Firewall that will monitor all incoming and outgoing traffic
 ApplicationGateway|Contain an Application Gateway etc...
 Management|Management subnet for Bastion host, accessible from gateway
 
-Both Gateway Subnet and AzureFirewallSubnet allow traffic out and can have public IPs. ApplicationGateway and Management subnet route traffic through the firewall and does not support public IPs due to asymmetric routing.
+The Gateway Subnet allow traffic out and can have public IPs. ApplicationGateway and Management subnet route traffic through the firewall and does not support public IPs due to asymmetric routing.
 
 ## Virtual Network service endpoints
 
