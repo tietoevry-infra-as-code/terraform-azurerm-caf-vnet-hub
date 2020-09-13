@@ -1,10 +1,10 @@
 module "vnet-hub" {
-  //source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
-  source = "../../"
+  source = "github.com/tietoevry-infra-as-code/terraform-azurerm-caf-vnet-hub?ref=v1.0.0"
+
   # By default, this module will create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name, 
   # and set the argument to `create_resource_group = false`. Location will be same as existing RG. 
-  resource_group_name = "rg-hub-shared-westeurope-001"
+  resource_group_name = "rg-hub-shared-westeurope-002"
   location            = "westeurope"
   hub_vnet_name       = "default-hub"
 

@@ -36,19 +36,14 @@ module "vnet-hub" {
   # By default, this module will create a resource group, proivde the name here
   # to use an existing resource group, specify the existing resource group name,
   # and set the argument to `create_resource_group = false`. Location will be same as existing RG.
-  # RG name must follow Azure naming convention. ex.: rg-<App or project name>-<Subscription type>-<Region>-<###>
-  # Resource group is named like this: rg-hub-tieto-internal-prod-westeurope-001
-  resource_group_name = "rg-hub-tieto-internal-shared-westeurope-001"
+  resource_group_name = "rg-hub-shared-westeurope-002"
   location            = "westeurope"
-
-  # (Required) Project_Name, Subscription_type and environment are must to create resource names.
-  project_name      = "tieto-internal"
-  subscription_type = "shared"
-  environment       = "dev"
+  hub_vnet_name       = "default-hub"
 
   # Provide valid VNet Address space and specify valid domain name for Private DNS Zone.  
-  vnet_address_space    = ["10.1.0.0/16"]
-  private_dns_zone_name = "publiccloud.tieto.com"
+  vnet_address_space            = ["10.1.0.0/16"]
+  gateway_subnet_address_prefix = ["10.1.1.0/27"]
+  private_dns_zone_name         = "publiccloud.example.com"
 
   # (Required) To enable Azure Monitoring and flow logs
   # Log Retention in days - Possible values range between 30 and 730
@@ -73,14 +68,13 @@ module "vnet-hub" {
       nsg_inbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any value and to use this subnet as a source or destination prefix.
-        ["weballow", "200", "Inbound", "Allow", "Tcp", "22", "*", ""],
-        ["weballow1", "201", "Inbound", "Allow", "Tcp", "3389", "*", ""],
+        ["ssh", "200", "Inbound", "Allow", "Tcp", "22", "*", ""],
+        ["rdp", "201", "Inbound", "Allow", "Tcp", "3389", "*", ""],
       ]
-
       nsg_outbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any value and to use this subnet as a source or destination prefix.
-        ["ntp_out", "103", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0"],
+        ["ntp_out", "203", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0"],
       ]
     }
 
@@ -91,8 +85,8 @@ module "vnet-hub" {
       nsg_inbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any value and to use this subnet as a source or destination prefix.
-        ["weballow", "100", "Inbound", "Allow", "Tcp", "80", "*", "0.0.0.0/0"],
-        ["weballow1", "101", "Inbound", "Allow", "Tcp", "443", "*", ""],
+        ["http", "100", "Inbound", "Allow", "Tcp", "80", "*", "0.0.0.0/0"],
+        ["https", "101", "Inbound", "Allow", "Tcp", "443", "*", ""],
 
       ]
       nsg_outbound_rules = [
@@ -106,7 +100,7 @@ module "vnet-hub" {
   # Adding TAG's to your Azure resources (Required)
   # ProjectName and Env are already declared above, to use them here, create a varible.
   tags = {
-    ProjectName  = "tieto-internal"
+    ProjectName  = "demo-internal"
     Env          = "dev"
     Owner        = "user@example.com"
     BusinessUnit = "CORP"
@@ -285,14 +279,14 @@ module "vnet-hub" {
       nsg_inbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any value and to use this subnet as a source or destination prefix.
-        ["weballow", "200", "Inbound", "Allow", "Tcp", "22", "*", ""],
-        ["weballow1", "201", "Inbound", "Allow", "Tcp", "3389", "*", ""],
+        ["ssh", "200", "Inbound", "Allow", "Tcp", "22", "*", ""],
+        ["rdp", "201", "Inbound", "Allow", "Tcp", "3389", "*", ""],
       ]
 
       nsg_outbound_rules = [
         # [name, priority, direction, access, protocol, destination_port_range, source_address_prefix, destination_address_prefix]
         # To use defaults, use "" without adding any value and to use this subnet as a source or destination prefix.
-        ["ntp_out", "103", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0"],
+        ["ntp_out", "203", "Outbound", "Allow", "Udp", "123", "", "0.0.0.0/0"],
       ]
     }
   }
@@ -362,6 +356,20 @@ module "vnet-hub" {
   }
 }
 ```
+
+## Requirements
+
+Name | Version
+-----|--------
+terraform | >= 0.12.20
+azurerm | ~> 2.23
+
+## Providers
+
+| Name | Version |
+|------|---------|
+azurerm | ~> 2.23
+random | n/a
 
 ## Inputs
 
