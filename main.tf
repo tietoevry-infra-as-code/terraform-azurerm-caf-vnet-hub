@@ -23,12 +23,12 @@ resource "azurerm_resource_group" "rg" {
 # VNET Creation - Default is "true"
 #-------------------------------------
 resource "azurerm_virtual_network" "vnet" {
-  name                = lower("vnet-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}-01")
+  name                = lower("vnet-${var.hub_vnet_name}-${local.location}")
   location            = local.location
   resource_group_name = local.resource_group_name
   address_space       = var.vnet_address_space
   dns_servers         = var.dns_servers
-  tags                = merge({ "ResourceName" = lower("vnet-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}-01") }, var.tags, )
+  tags                = merge({ "ResourceName" = lower("vnet-${var.hub_vnet_name}-${local.location}") }, var.tags, )
 
   dynamic "ddos_protection_plan" {
     for_each = local.if_ddos_enabled
@@ -45,10 +45,10 @@ resource "azurerm_virtual_network" "vnet" {
 #--------------------------------------------
 resource "azurerm_network_ddos_protection_plan" "ddos" {
   count               = var.create_ddos_plan ? 1 : 0
-  name                = lower("${var.project_name}-ddos-protection-plan-${var.subscription_type}")
+  name                = lower("${var.hub_vnet_name}-ddos-protection-plan")
   resource_group_name = local.resource_group_name
   location            = local.location
-  tags                = merge({ "ResourceName" = lower("${var.project_name}-ddos-protection-plan-${var.subscription_type}") }, var.tags, )
+  tags                = merge({ "ResourceName" = lower("${var.hub_vnet_name}-ddos-protection-plan") }, var.tags, )
 }
 
 #-------------------------------------
@@ -73,16 +73,17 @@ resource "azurerm_network_watcher" "nwatcher" {
 # Subnets Creation with, private link endpoint/servie network policies, service endpoints and Deligation.
 #--------------------------------------------------------------------------------------------------------
 resource "azurerm_subnet" "gw_snet" {
-  name                 = lower(format("snet-%s-${var.subscription_type}-${local.location}", "gateway"))
+  count                = var.gateway_subnet_address_prefix != null ? 1 : 0
+  name                 = "GatewaySubnet"
   resource_group_name  = local.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
-  address_prefixes     = [cidrsubnet(element(var.vnet_address_space, 0), 8, 1)]
+  address_prefixes     = var.gateway_subnet_address_prefix #[cidrsubnet(element(var.vnet_address_space, 0), 8, 1)]
   service_endpoints    = ["Microsoft.Storage"]
 }
 
 resource "azurerm_subnet" "snet" {
   for_each             = var.subnets
-  name                 = lower(format("snet-%s-${var.subscription_type}-${local.location}", each.value.subnet_name))
+  name                 = lower(format("snet-%s-${var.hub_vnet_name}-${local.location}", each.value.subnet_name))
   resource_group_name  = local.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefixes     = each.value.subnet_address_prefix
@@ -175,14 +176,14 @@ resource "azurerm_role_assignment" "dns" {
 # Storage Account for Logs Archive
 #-----------------------------------------------
 resource "azurerm_storage_account" "storeacc" {
-  name                      = format("stdiaglogs%s", lower(replace(var.project_name, "/[[:^alnum:]]/", "")))
+  name                      = format("stdiaglogs%s", lower(replace(var.hub_vnet_name, "/[[:^alnum:]]/", "")))
   resource_group_name       = local.resource_group_name
   location                  = local.location
   account_kind              = "StorageV2"
   account_tier              = "Standard"
   account_replication_type  = "GRS"
   enable_https_traffic_only = true
-  tags                      = merge({ "ResourceName" = format("stdiaglogs%s", lower(replace(var.project_name, "/[[:^alnum:]]/", ""))) }, var.tags, )
+  tags                      = merge({ "ResourceName" = format("stdiaglogs%s", lower(replace(var.hub_vnet_name, "/[[:^alnum:]]/", ""))) }, var.tags, )
 }
 
 #-----------------------------------------------
@@ -192,17 +193,17 @@ resource "random_string" "main" {
   length  = 8
   special = false
   keepers = {
-    name = var.project_name
+    name = var.hub_vnet_name
   }
 }
 
 resource "azurerm_log_analytics_workspace" "logws" {
-  name                = lower("logaws-${random_string.main.result}-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}")
+  name                = lower("logaws-${random_string.main.result}-${var.hub_vnet_name}-${local.location}")
   resource_group_name = local.resource_group_name
   location            = local.location
   sku                 = var.log_analytics_workspace_sku
   retention_in_days   = var.log_analytics_logs_retention_in_days
-  tags                = merge({ "ResourceName" = lower("logaws-${random_string.main.result}-${var.project_name}-${var.subscription_type}-${var.environment}-${local.location}") }, var.tags, )
+  tags                = merge({ "ResourceName" = lower("logaws-${random_string.main.result}-${var.hub_vnet_name}-${local.location}") }, var.tags, )
 }
 
 #-----------------------------------------
@@ -234,7 +235,7 @@ resource "azurerm_network_watcher_flow_log" "nwflog" {
 # azurerm monitoring diagnostics - VNet, NSG, PIP, and Firewall
 #---------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "vnet" {
-  name                       = lower("vnet-${var.project_name}-diag")
+  name                       = lower("vnet-${var.hub_vnet_name}-diag")
   target_resource_id         = azurerm_virtual_network.vnet.id
   storage_account_id         = azurerm_storage_account.storeacc.id
   log_analytics_workspace_id = azurerm_log_analytics_workspace.logws.id

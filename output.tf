@@ -1,4 +1,3 @@
-# Resource Group
 output "resource_group_name" {
   description = "The name of the resource group in which resources are created"
   value       = element(coalescelist(data.azurerm_resource_group.rgrp.*.name, azurerm_resource_group.rg.*.name, [""]), 0)
@@ -14,7 +13,6 @@ output "resource_group_location" {
   value       = element(coalescelist(data.azurerm_resource_group.rgrp.*.location, azurerm_resource_group.rg.*.location, [""]), 0)
 }
 
-# Vnet and Subnets
 output "virtual_network_name" {
   description = "The name of the virtual network"
   value       = element(concat(azurerm_virtual_network.vnet.*.name, [""]), 0)
@@ -32,27 +30,24 @@ output "virtual_network_address_space" {
 
 output "subnet_ids" {
   description = "List of IDs of subnets"
-  value       = flatten(concat([for s in azurerm_subnet.snet : s.id], [azurerm_subnet.gw_snet.id]))
+  value       = flatten(concat([for s in azurerm_subnet.snet : s.id], [azurerm_subnet.gw_snet.0.id]))
 }
 
 output "subnet_address_prefixes" {
   description = "List of address prefix for subnets"
-  value       = flatten(concat([for s in azurerm_subnet.snet : s.address_prefix], [azurerm_subnet.gw_snet.address_prefixes]))
+  value       = flatten(concat([for s in azurerm_subnet.snet : s.address_prefix], [azurerm_subnet.gw_snet.0.address_prefixes]))
 }
 
-# Network Security group ids
 output "network_security_group_ids" {
   description = "List of Network security groups and ids"
   value       = [for n in azurerm_network_security_group.nsg : n.id]
 }
 
-# DDoS Protection Plan
 output "ddos_protection_plan_id" {
   description = "Ddos protection plan details"
-  value       = element(concat(azurerm_network_ddos_protection_plan.ddos.*.id, [""]), 0)
+  value       = var.create_ddos_plan ? element(concat(azurerm_network_ddos_protection_plan.ddos.*.id, [""]), 0) : null
 }
 
-# Network Watcher
 output "network_watcher_id" {
   description = "ID of Network Watcher"
   value       = element(concat(azurerm_network_watcher.nwatcher.*.id, [""]), 0)
@@ -60,11 +55,11 @@ output "network_watcher_id" {
 
 output "private_dns_zone_name" {
   description = "The name of Private DNS zones within Azure DNS"
-  value       = azurerm_private_dns_zone.dz[0].name
+  value       = var.private_dns_zone_name != null ? azurerm_private_dns_zone.dz[0].name : null
 }
 output "private_dns_zone_id" {
   description = "The resource id of Private DNS zones within Azure DNS"
-  value       = azurerm_private_dns_zone.dz[0].id
+  value       = var.private_dns_zone_name != null ? azurerm_private_dns_zone.dz[0].id : null
 }
 
 output "storage_account_id" {
