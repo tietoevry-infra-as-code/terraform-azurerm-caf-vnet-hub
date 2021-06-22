@@ -1,3 +1,5 @@
+> ## This repository is no longer maintained actively. Please visit https://github.com/kumarvna?tab=repositories for the latest updates.
+
 # Azure Virtual Network Hub Terraform Module
 
 This module deploys a hub network using the [Microsoft recommended Hub-Spoke network topology](https://docs.microsoft.com/en-us/azure/architecture/reference-architectures/hybrid-networking/hub-spoke). Usually, only one hub in each region with multiple spokes and each of them can also be in separate subscriptions.
